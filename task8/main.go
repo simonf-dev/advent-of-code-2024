@@ -36,6 +36,7 @@ func parseField(filePath string) fieldInfo {
 	for scanner.Scan() {
 		strippedLine := strings.TrimSpace(scanner.Text())
 		for rowIndex, char := range strippedLine {
+			field.sizeX = rowIndex + 1
 			if char == '.' {
 				continue
 			}
@@ -45,22 +46,25 @@ func parseField(filePath string) fieldInfo {
 			} else {
 				field.antennas[char] = []location{location{positionX: rowIndex, positionY: lineIndex}}
 			}
-			field.sizeX = rowIndex + 1
 		}
+		lineIndex += 1
 	}
-	field.sizeY = lineIndex + 1
+	field.sizeY = lineIndex
 	return field
 }
 
 func countAntinnode(firstAntenna, secondAntenna location, positionList *map[location]struct{}, sizeX, sizeY int) {
 	differenceX, differenceY := firstAntenna.positionX-secondAntenna.positionX, firstAntenna.positionY-secondAntenna.positionY
-	firstPosition := location{positionX: firstAntenna.positionX + differenceX, positionY: firstAntenna.positionY + differenceY}
-	secondPosition := location{positionX: secondAntenna.positionX - differenceX, positionY: secondAntenna.positionY - differenceY}
-	if sizeY > firstPosition.positionY && firstPosition.positionY >= 0 && sizeX > firstPosition.positionX && firstPosition.positionX >= 0 {
+	firstPosition := location{positionX: firstAntenna.positionX, positionY: firstAntenna.positionY}
+	for sizeY > firstPosition.positionY && firstPosition.positionY >= 0 && sizeX > firstPosition.positionX && firstPosition.positionX >= 0 {
 		(*positionList)[firstPosition] = struct{}{}
+		firstPosition = location{positionX: firstPosition.positionX + differenceX, positionY: firstPosition.positionY + differenceY}
 	}
-	if sizeY > secondPosition.positionY && secondPosition.positionY >= 0 && sizeX > secondPosition.positionX && secondPosition.positionX >= 0 {
-		(*positionList)[firstPosition] = struct{}{}
+
+	secondPosition := location{positionX: secondAntenna.positionX, positionY: secondAntenna.positionY}
+	for sizeY > secondPosition.positionY && secondPosition.positionY >= 0 && sizeX > secondPosition.positionX && secondPosition.positionX >= 0 {
+		(*positionList)[secondPosition] = struct{}{}
+		secondPosition = location{positionX: secondPosition.positionX - differenceX, positionY: secondPosition.positionY - differenceY}
 	}
 }
 
@@ -73,10 +77,23 @@ func countAntinnodes(field *fieldInfo) {
 		}
 	}
 }
+
+func printField(field fieldInfo) {
+	for rowIndex := range field.sizeY {
+		for columnIndex := range field.sizeX {
+			_, contains := field.antinodes[location{positionX: columnIndex, positionY: rowIndex}]
+			if contains {
+				fmt.Print("X")
+			} else {
+				fmt.Print(".")
+			}
+		}
+		fmt.Print("\n")
+	}
+}
 func main() {
 	output := parseField("input.txt")
-	fmt.Println(output)
 	countAntinnodes(&output)
 	fmt.Println(len(output.antinodes))
-
+	printField(output)
 }
