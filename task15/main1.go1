@@ -1,0 +1,159 @@
+/*
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+const FIELD_WIDE = 101
+const FIELD_TALL = 103
+
+type Field int
+
+const (
+	Empty Field = iota
+	Robot
+	Box
+	Barrier
+)
+
+type Direction int
+
+const (
+	Right Direction = iota
+	Left
+	Top
+	Down
+)
+
+func decideMove(direction Direction) (int, int) {
+	switch direction {
+	case Top:
+		return -1, 0
+	case Down:
+		return 1, 0
+	case Right:
+		return 0, 1
+	case Left:
+		return 0, -1
+	default:
+		panic("Invalid direction")
+	}
+}
+
+func moveField(direction Direction, x, y int, fields [][]Field) (int, int) {
+	if x <= 0 || y <= 0 || y >= len(fields) || x >= len(fields[0]) {
+		panic("Trying to move from bad field")
+	}
+	newY, newX := decideMove(direction)
+	newY += y
+	newX += x
+	if newX <= 0 || newY <= 0 || newY >= len(fields) || newX >= len(fields[0]) {
+		return x, y
+	}
+	fieldValue := fields[newY][newX]
+	switch fieldValue {
+	case Barrier:
+		return x, y
+	case Empty:
+		fields[newY][newX] = fields[y][x]
+		fields[y][x] = Empty
+		return newX, newY
+	case Robot:
+		panic("Cannot move object to robot, something is wrong")
+	case Box:
+		moveField(direction, newX, newY, fields)
+		if fields[newY][newX] == Empty {
+			fields[newY][newX] = fields[y][x]
+			fields[y][x] = Empty
+			return newX, newY
+		}
+	}
+	return x, y
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func ParseField(filePath string) ([][]Field, int, int) {
+	file, err := os.Open(filePath)
+	check(err)
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	field := make([][]Field, 0)
+	robotX, robotY := 0, 0
+	y := 0
+	for scanner.Scan() {
+		text := scanner.Text()
+		line := make([]Field, len(text))
+		for x, char := range text {
+			switch char {
+			case '#':
+				line[x] = Barrier
+			case '@':
+				line[x] = Robot
+				robotX, robotY = x, y
+			case '.':
+				line[x] = Empty
+			case 'O':
+				line[x] = Box
+			}
+		}
+		y += 1
+		field = append(field, line)
+	}
+	return field, robotX, robotY
+}
+
+func ParseMoves(filePath string) []Direction {
+	file, err := os.Open(filePath)
+	check(err)
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	directions := make([]Direction, 0)
+	for scanner.Scan() {
+		text := scanner.Text()
+		for _, char := range text {
+			switch char {
+			case '>':
+				directions = append(directions, Right)
+			case '^':
+				directions = append(directions, Top)
+			case '<':
+				directions = append(directions, Left)
+			case 'v':
+				directions = append(directions, Down)
+			}
+		}
+	}
+	return directions
+}
+
+func CountResult(field [][]Field) int {
+	result := 0
+	for y := range field {
+		for x := range field[y] {
+			if field[y][x] == Box {
+				result += y*100 + x
+			}
+		}
+	}
+	return result
+}
+func main() {
+	field, robotX, robotY := ParseField("plan.txt")
+	directions := ParseMoves("moves.txt")
+	for _, direction := range directions {
+		robotX, robotY = moveField(direction, robotX, robotY, field)
+	}
+	fmt.Println(CountResult(field))
+
+}
+*/ 

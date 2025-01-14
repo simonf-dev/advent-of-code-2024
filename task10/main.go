@@ -96,7 +96,7 @@ func parseTrailMap(filePath string) []*trailPoint {
 
 func main() {
 	filteredStarts := parseTrailMap("input.txt")
-	sumTrails := 0
+	var sumTrails = 0
 	for _, value := range filteredStarts {
 		sumTrails += value.checkTrail()
 	}
