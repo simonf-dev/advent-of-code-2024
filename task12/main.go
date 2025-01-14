@@ -206,4 +206,5 @@ func countCost(field [][]rune) int {
 func main() {
 	field := parseInput("/home/simon/Projects/go-advent-2024/task12/input.txt")
 	fmt.Println(countCost(field))
+	a()
 }
