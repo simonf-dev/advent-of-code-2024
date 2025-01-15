@@ -165,7 +165,8 @@ func main() {
 	program, err := ParseCommaSeparatedFile("input")
 	check(err)
 	registers := make(map[rune]int)
-	registers['A'] = 729
+	registers['A'] = 7 * 20
+
 	registers['B'] = 0
 	registers['C'] = 0
 	result := PerformExecution(0, program, registers)
