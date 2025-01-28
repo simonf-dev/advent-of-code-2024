@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func main() {
+func mainLogic() {
 	fileContent, _ := readInputFile("input.txt")
 	result := processStrings(fileContent, ", ")
 	printResult(result)
@@ -16,7 +16,7 @@ func main() {
 	produceCount := 0
 	for _, value := range combinations {
 		for _, combination := range value {
-			if canBeProduced(combination, result, len(combination)) {
+			if canBeProduced(combination, result, len(combination), make(map[string]bool)) {
 				produceCount += 1
 			}
 		}
@@ -72,14 +72,14 @@ func processStrings(input string, sep string) map[int][]string {
 func filterWords(words []string, wordMap map[int][]string) []string {
 	var result []string
 	for _, word := range words {
-		if !canBeProduced(word, wordMap, len(word)) {
+		if !canBeProduced(word, wordMap, len(word), make(map[string]bool)) {
 			result = append(result, word)
 		}
 	}
 	return result
 }
 
-func canBeProduced(word string, wordMap map[int][]string, startingSize int) bool {
+func canBeProduced(word string, wordMap map[int][]string, startingSize int, cache map[string]bool) bool {
 	if len(word) == 0 {
 		return true
 	}
@@ -87,9 +87,14 @@ func canBeProduced(word string, wordMap map[int][]string, startingSize int) bool
 	for i := 1; i <= len(word) && i < startingSize; i++ {
 		prefix := word[:i]
 		suffix := word[i:]
+		value, containsSuf := cache[suffix]
+		if containsSuf {
+			return value
+		}
 
-		if contains(wordMap[len(prefix)], prefix) && canBeProduced(suffix, wordMap, startingSize) {
-			return true
+		if contains(wordMap[len(prefix)], prefix) {
+			cache[suffix] = canBeProduced(suffix, wordMap, startingSize, cache)
+			return cache[suffix]
 		}
 	}
 
